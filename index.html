@@ -10,32 +10,50 @@
             margin: 0;
         }
 
+        body {
+            overflow: hidden;
+        }
+
         canvas {
             background-color: green;
             ;
         }
 
-        button {
+        #tools {
             position: fixed;
-            top: 0;
             left: 0;
+            bottom: 0;
+        }
+
+        .active {
+            background: aqua;
         }
     </style>
 </head>
 
 <body>
     <canvas id="canvas" width=300 height=300></canvas>
-    <button id="earser">橡皮擦</button>
+    <div id="tools">
+        <button id="eraser">橡皮擦</button>
+        <button id="pen">画笔</button>
+        <a id="link"></a>
+        <button id="download">下载</button>
+    </div>
     <script>
         var paint = false;
-        var earserEnabled = false;
+        var eraserEnabled = false;
         var lastPoint = { x: undefined, y: undefined }
         var ctx = canvas.getContext("2d");
+        canvasSize();
+        window.onresize = function () {
+            canvasSize();
+        }
         //设备检测
         if (document.body.ontouchstart !== undefined) {
             canvas.ontouchstart = function (a) {
                 var x = a.touches[0].clientX;
                 var y = a.touches[0].clientY;
+                a.preventDefault;
                 paint = true;
                 lastPoint.x = x;
                 lastPoint.y = y;
@@ -45,10 +63,9 @@
                     var x = a.touches[0].clientX;
                     var y = a.touches[0].clientY;
                     var newpoint = { "x": x, "y": y };
-                    if (earserEnabled) {
+                    if (eraserEnabled) {
                         ctx.clearRect(x, y, 50, 50);
                     } else {
-                        // console.log(earser);
                         drawLine(lastPoint.x, lastPoint.y, newpoint.x, newpoint.y);
                         lastPoint = newpoint;
                     }
@@ -57,10 +74,6 @@
             canvas.ontouchend = function () {
                 paint = false;
             }
-        }
-        canvasSize();
-        window.onresize = function () {
-            canvasSize();
         }
         //监听键盘
         canvas.onmousedown = function (e) {
@@ -75,10 +88,9 @@
                 var x = e.clientX;
                 var y = e.clientY;
                 var newpoint = { "x": x, "y": y };
-                if (earserEnabled) {
+                if (eraserEnabled) {
                     ctx.clearRect(x, y, 50, 50);
                 } else {
-                    // console.log(earser);
                     drawLine(lastPoint.x, lastPoint.y, newpoint.x, newpoint.y);
                     lastPoint = newpoint;
                 }
@@ -97,9 +109,22 @@
             ctx.closePath();
             ctx.stroke();
         }
-        var earser = document.getElementById("earser");
-        earser.onclick = function () {
-            earserEnabled = !earserEnabled;
+        var eraser = document.getElementById("eraser");
+        eraser.onclick = function () {
+            eraserEnabled = true;
+            eraser.classList.add("active");
+            pen.classList.remove("active");
+        }
+        pen.onclick = function () {
+            eraserEnabled = false;
+            pen.classList.add("active");
+            eraser.classList.remove("active");
+        }
+        download.onclick = function () {
+            var link = document.getElementById('link');
+            link.setAttribute('download', 'my.png');
+            link.setAttribute('href', canvas.toDataURL("image/jpg").replace("image/jpeg", "image/octet-stream"));
+            link.click();
         }
         function canvasSize() {
             var width = document.documentElement.clientWidth;
