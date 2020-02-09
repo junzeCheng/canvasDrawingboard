@@ -6,74 +6,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        *{
-            margin:0;
+        * {
+            margin: 0;
         }
-        canvas{
-            background-color: green;;
+
+        canvas {
+            background-color: green;
+            ;
         }
-        button{
+
+        button {
             position: fixed;
-            top:0;
+            top: 0;
             left: 0;
         }
     </style>
 </head>
 
-<body >
+<body>
     <canvas id="canvas" width=300 height=300></canvas>
     <button id="earser">橡皮擦</button>
     <script>
-        var paint=false;
-        var earserEnabled=false;
-        var lastPoint={x:undefined,y:undefined}
+        var paint = false;
+        var earserEnabled = false;
+        var lastPoint = { x: undefined, y: undefined }
         var ctx = canvas.getContext("2d");
+        //设备检测
+        if (document.body.ontouchstart !== undefined) {
+            canvas.ontouchstart = function (a) {
+                var x = a.touches[0].clientX;
+                var y = a.touches[0].clientY;
+                paint = true;
+                lastPoint.x = x;
+                lastPoint.y = y;
+            }
+            canvas.ontouchmove = function (a) {
+                if (paint) {
+                    var x = a.touches[0].clientX;
+                    var y = a.touches[0].clientY;
+                    var newpoint = { "x": x, "y": y };
+                    if (earserEnabled) {
+                        ctx.clearRect(x, y, 50, 50);
+                    } else {
+                        // console.log(earser);
+                        drawLine(lastPoint.x, lastPoint.y, newpoint.x, newpoint.y);
+                        lastPoint = newpoint;
+                    }
+                }
+            }
+            canvas.ontouchend = function () {
+                paint = false;
+            }
+        }
         canvasSize();
-        window.onresize=function(){
+        window.onresize = function () {
             canvasSize();
         }
-        canvas.onmousedown=function(e){
-            var x=e.clientX;
-            var y=e.clientY;
-            paint=true;
-            lastPoint.x=x;
-            lastPoint.y=y;
+        //监听键盘
+        canvas.onmousedown = function (e) {
+            var x = e.clientX;
+            var y = e.clientY;
+            paint = true;
+            lastPoint.x = x;
+            lastPoint.y = y;
         }
-        canvas.onmousemove=function(e){
-            if(paint){
-            var x=e.clientX;
-            var y=e.clientY;
-            var newpoint={"x":x,"y":y};
-            if(earserEnabled){
-            ctx.clearRect(x,y,50,50);
-            }else{
-                // console.log(earser);
-                drawLine(lastPoint.x,lastPoint.y,newpoint.x,newpoint.y);
-                lastPoint=newpoint;
+        canvas.onmousemove = function (e) {
+            if (paint) {
+                var x = e.clientX;
+                var y = e.clientY;
+                var newpoint = { "x": x, "y": y };
+                if (earserEnabled) {
+                    ctx.clearRect(x, y, 50, 50);
+                } else {
+                    // console.log(earser);
+                    drawLine(lastPoint.x, lastPoint.y, newpoint.x, newpoint.y);
+                    lastPoint = newpoint;
+                }
             }
-            }
         }
-        canvas.onmouseup=function(){
-            paint=false;
+        canvas.onmouseup = function () {
+            paint = false;
         }
-        function drawLine(x1,y1,x2,y2){
+        //画线
+        function drawLine(x1, y1, x2, y2) {
             ctx.beginPath();
             // ctx.strokestyle="black";
-            ctx.moveTo(x1,y1);
-            ctx.lineWidth=5;
-            ctx.lineTo(x2,y2);
+            ctx.moveTo(x1, y1);
+            ctx.lineWidth = 5;
+            ctx.lineTo(x2, y2);
             ctx.closePath();
             ctx.stroke();
         }
-        var earser=document.getElementById("earser");
-        earser.onclick=function(){
-            earserEnabled=!earserEnabled;
+        var earser = document.getElementById("earser");
+        earser.onclick = function () {
+            earserEnabled = !earserEnabled;
         }
-        function canvasSize(){
-        var width=document.documentElement.clientWidth;
-        var height=document.documentElement.clientHeight;
-        canvas.width=width;
-        canvas.height=height;
+        function canvasSize() {
+            var width = document.documentElement.clientWidth;
+            var height = document.documentElement.clientHeight;
+            canvas.width = width;
+            canvas.height = height;
         }
     </script>
 </body>
