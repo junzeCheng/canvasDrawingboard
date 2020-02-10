@@ -104,7 +104,9 @@
             ctx.beginPath();
             // ctx.strokestyle="black";
             ctx.moveTo(x1, y1);
-            ctx.lineWidth = 5;
+            ctx.lineWidth = 20;
+            ctx.lineCap = 'round';//round butt square
+            ctx.lineJoin = 'round'; //round miter bevel
             ctx.lineTo(x2, y2);
             ctx.closePath();
             ctx.stroke();
